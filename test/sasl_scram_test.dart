@@ -14,11 +14,16 @@ import 'example_scram_sha256_simple.dart';
 
 void main() async {
   group('Scram Authentication', () {
-    final scramExamples = [ScramSha1Example(), ScramSha256Example(), SimpleScramSha256Example()];
+    final scramExamples = [
+      ScramSha1Example(),
+      ScramSha256Example(),
+      SimpleScramSha256Example()
+    ];
     for (final scramExample in scramExamples) {
       final authenticator = scramExample.getAuthenticator();
 
-      test('Should be able to return the client first message for the server', () {
+      test('Should be able to return the client first message for the server',
+          () {
         final bytesReceivedFromServer = Uint8List(0);
 
         final bytesToSentToServer = authenticator.handleMessage(
@@ -39,7 +44,8 @@ void main() async {
       test(
           'Should be able to interpret the first server response and return the client final message with proof for the server',
           () {
-        final bytesReceivedFromServer = coerceUint8List(utf8.encode(scramExample.SERVER_FIRST_MESSAGE()));
+        final bytesReceivedFromServer =
+            coerceUint8List(utf8.encode(scramExample.SERVER_FIRST_MESSAGE()));
 
         final bytesToSentToServer = authenticator.handleMessage(
           SaslMessageType.AuthenticationSASLContinue,
@@ -53,8 +59,11 @@ void main() async {
         expect(parsed['p'], scramExample.CLIENT_FINAL_MESSAGE_PROOF());
       });
 
-      test('Should be able to interpret the final server response and check the server proof', () {
-        final bytesReceivedFromServer = coerceUint8List(utf8.encode(scramExample.SERVER_FINAL_MESSAGE()));
+      test(
+          'Should be able to interpret the final server response and check the server proof',
+          () {
+        final bytesReceivedFromServer =
+            coerceUint8List(utf8.encode(scramExample.SERVER_FINAL_MESSAGE()));
 
         expect(authenticator.currentStep is ClientLast, true);
         final clientLastStep = authenticator.currentStep as ClientLast;
@@ -79,7 +88,8 @@ void main() async {
       var results = {};
 
       for (var i = 0; i < 100000; ++i) {
-        var generatedString = generator.generate(SaslAuthenticator.DefaultNonceLength);
+        var generatedString =
+            generator.generate(SaslAuthenticator.DefaultNonceLength);
         if (results.containsKey(generatedString)) {
           fail("Shouldn't have generated 2 identical strings");
         } else {

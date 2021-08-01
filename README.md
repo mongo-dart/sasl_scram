@@ -1,7 +1,6 @@
 # Sasl Scram for Dart
-Implementation of the Salted Challenge Response Authentication Mechanism in Dart.
 
-A library for Dart developers.
+Implementation of the Salted Challenge Response Authentication Mechanism in Dart.
 
 ## Usage
 

@@ -8,7 +8,8 @@ abstract class Authenticator {
 
   Authenticator();
 
-  Uint8List? handleMessage(SaslMessageType msgType, Uint8List bytesReceivedFromServer);
+  Uint8List? handleMessage(
+      SaslMessageType msgType, Uint8List bytesReceivedFromServer);
 }
 
 class UsernamePasswordCredential {

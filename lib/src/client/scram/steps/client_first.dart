@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:crypto/crypto.dart';
+import 'package:saslprep/saslprep.dart';
 
 import '../../../sasl_scram_exception.dart';
 import '../../../utils/parsing.dart';
@@ -18,14 +19,17 @@ class ClientFirst extends SaslStep {
   final String rPrefix;
   final Hash hash;
 
-  ClientFirst(Uint8List bytesToSendToServer, this.hash, this.credential, this.clientFirstMessageBare, this.rPrefix)
+  ClientFirst(Uint8List bytesToSendToServer, this.hash, this.credential,
+      this.clientFirstMessageBare, this.rPrefix)
       : super(bytesToSendToServer);
 
   @override
-  SaslStep transition(List<int> bytesReceivedFromServer) {
+  SaslStep transition(List<int> bytesReceivedFromServer,
+      {passwordDigestResolver? passwordDigestResolver}) {
     final serverFirstMessage = utf8.decode(bytesReceivedFromServer);
 
-    final Map<String, dynamic> decodedMessage = parsePayload(serverFirstMessage);
+    final Map<String, dynamic> decodedMessage =
+        parsePayload(serverFirstMessage);
 
     final r = decodedMessage['r'] as String?;
     if (r == null || !r.startsWith(rPrefix)) {
@@ -40,15 +44,20 @@ class ClientFirst extends SaslStep {
     final nonce = 'r=$r';
     final clientFinalMessageWithoutProof = '$channelBinding,$nonce';
 
-    // final passwordDigest = md5DigestPassword(credential.username, credential.password);
-    // TODO Mongo uses password digest, which isn't specified in the protocol (?)
-    final passwordDigest = credential.password!;
+    String passwordDigest;
+    if (passwordDigestResolver != null) {
+      passwordDigest = passwordDigestResolver(credential);
+    } else {
+      passwordDigest = Saslprep.saslprep(credential.password!);
+    }
+
     final salt = base64.decode(s.toString());
 
     final saltedPassword = hi(passwordDigest, salt, i, hash);
     final clientKey = computeHMAC(saltedPassword, 'Client Key', hash);
     final storedKey = h(clientKey, hash);
-    final authMessage = '$clientFirstMessageBare,$serverFirstMessage,$clientFinalMessageWithoutProof';
+    final authMessage =
+        '$clientFirstMessageBare,$serverFirstMessage,$clientFinalMessageWithoutProof';
     final clientSignature = computeHMAC(storedKey, authMessage, hash);
     final clientProof = xor(clientKey, clientSignature);
     final serverKey = computeHMAC(saltedPassword, 'Server Key', hash);
@@ -58,7 +67,8 @@ class ClientFirst extends SaslStep {
     final proof = 'p=$base64clientProof';
     final clientFinalMessage = '$clientFinalMessageWithoutProof,$proof';
 
-    return ClientLast(coerceUint8List(utf8.encode(clientFinalMessage)), serverSignature);
+    return ClientLast(
+        coerceUint8List(utf8.encode(clientFinalMessage)), serverSignature);
   }
 
   static Uint8List computeHMAC(Uint8List data, String key, Hash hash) {
@@ -70,10 +80,6 @@ class ClientFirst extends SaslStep {
   static Uint8List h(Uint8List data, Hash hash) {
     return Uint8List.fromList(hash.convert(data).bytes);
   }
-
-  /*static String md5DigestPassword(username, password) {
-    return crypto.md5.convert(utf8.encode('$username:postgresql:$password')).toString();
-  }*/
 
   static Uint8List xor(Uint8List a, Uint8List b) {
     final result = <int>[];
@@ -91,7 +97,8 @@ class ClientFirst extends SaslStep {
     return Uint8List.fromList(result);
   }
 
-  static Uint8List hi(String password, Uint8List salt, int iterations, Hash hash) {
+  static Uint8List hi(
+      String password, Uint8List salt, int iterations, Hash hash) {
     final digest = (List<int> msg) {
       final hmac = crypto.Hmac(hash, password.codeUnits);
       return Uint8List.fromList(hmac.convert(msg).bytes);
