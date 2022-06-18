@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
 import '../../sasl_scram.dart';
-import 'auth.dart';
 
 enum SaslMessageType {
   AuthenticationSASL,

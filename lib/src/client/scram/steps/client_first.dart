@@ -100,7 +100,7 @@ class ClientFirst extends SaslStep {
   static Uint8List hi(
       String password, Uint8List salt, int iterations, Hash hash) {
     final digest = (List<int> msg) {
-      final hmac = crypto.Hmac(hash, password.codeUnits);
+      final hmac = crypto.Hmac(hash, utf8.encode(password) /*  .codeUnits */);
       return Uint8List.fromList(hmac.convert(msg).bytes);
     };
 

@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:crypto/crypto.dart';
 import 'package:sasl_scram/sasl_scram.dart';
+import 'package:sasl_scram/src/client/scram/steps/client_first.dart';
 import 'package:sasl_scram/src/client/scram/steps/client_last.dart';
 import 'package:sasl_scram/src/utils/parsing.dart';
 import 'package:sasl_scram/src/utils/sasl.dart';
@@ -96,6 +98,81 @@ void main() async {
           results[generatedString] = 1;
         }
       }
+    });
+  });
+  group('Static Methods', () {
+    test('hi', () {
+      var salt = [
+        99,
+        152,
+        63,
+        114,
+        74,
+        185,
+        151,
+        114,
+        213,
+        141,
+        130,
+        192,
+        111,
+        106,
+        92,
+        21,
+        188,
+        147,
+        158,
+        198,
+        94,
+        89,
+        75,
+        136,
+        105,
+        183,
+        207,
+        24
+      ];
+      var password = 'übelkübel';
+      var iterations = 15000;
+
+      var result = [
+        229,
+        212,
+        50,
+        8,
+        194,
+        32,
+        193,
+        73,
+        95,
+        176,
+        199,
+        198,
+        15,
+        144,
+        48,
+        86,
+        6,
+        240,
+        51,
+        35,
+        45,
+        158,
+        174,
+        188,
+        64,
+        181,
+        6,
+        165,
+        174,
+        112,
+        102,
+        90
+      ];
+
+      var ret = ClientFirst.hi(
+          password, Uint8List.fromList(salt), iterations, sha256);
+      expect(ret, result);
     });
   });
 }
