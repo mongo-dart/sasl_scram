@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:crypto/crypto.dart';
 import 'package:sasl_scram/sasl_scram.dart';
 

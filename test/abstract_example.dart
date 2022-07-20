@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:sasl_scram/sasl_scram.dart';
 
 abstract class ScramExample {

@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names, camel_case_types
+
 import 'dart:typed_data';
 
 import '../../sasl_scram.dart';
