@@ -21,9 +21,8 @@ class ClientFirst extends SaslStep {
   final String rPrefix;
   final Hash hash;
 
-  ClientFirst(Uint8List bytesToSendToServer, this.hash, this.credential,
-      this.clientFirstMessageBare, this.rPrefix)
-      : super(bytesToSendToServer);
+  ClientFirst(super.bytesToSendToServer, this.hash, this.credential,
+      this.clientFirstMessageBare, this.rPrefix);
 
   @override
   SaslStep transition(List<int> bytesReceivedFromServer,

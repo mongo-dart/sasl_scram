@@ -11,8 +11,7 @@ import 'client_completed.dart';
 class ClientLast extends SaslStep {
   Uint8List serverSignature64;
 
-  ClientLast(Uint8List bytesToSendToServer, this.serverSignature64)
-      : super(bytesToSendToServer);
+  ClientLast(super.bytesToSendToServer, this.serverSignature64);
 
   @override
   SaslStep transition(List<int> bytesReceivedFromServer,

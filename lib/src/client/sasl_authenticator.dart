@@ -55,8 +55,8 @@ abstract class SaslAuthenticator extends Authenticator {
       case SaslMessageType.AuthenticationSASLFinal:
         currentStep = currentStep.transition(bytesReceivedFromServer);
         return null;
-      default:
-        throw SaslScramException('Unsupported authentication type $msgType.');
+      /*     default:
+        throw SaslScramException('Unsupported authentication type $msgType.'); */
     }
     return currentStep.bytesToSendToServer;
   }
